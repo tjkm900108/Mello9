@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mellogram v9.7 | Treasury Node</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { --mello-blue: #5d87ff; --mello-bg: #0b0f1a; }
+        body { background-color: var(--mello-bg); color: #e5e7eb; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        #map { height: 160px; width: 100%; filter: saturate(1.5) brightness(0.4); z-index: 10; border-bottom: 1px solid rgba(93,135,255,0.2); }
+        .glass { background: rgba(23, 28, 41, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
+        .modal { display: none; position: fixed; inset: 0; z-index: 3000; background: rgba(2, 6, 23, 0.98); padding: 20px; flex-direction: column; }
+        .auth-screen { position: fixed; inset: 0; z-index: 4000; background: #0b0f1a; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .feed-container { max-height: 250px; overflow-y: auto; scrollbar-width: none; }
+    </style>
+</head>
+<body class="pb-32">
+
+    <div id="auth-layer" class="auth-screen">
+        <div class="w-full max-w-sm glass p-8 rounded-3xl border border-blue-500/20 text-center">
+            <h1 class="text-3xl font-black text-white italic mb-2">MELLO<span class="text-blue-500">9</span></h1>
+            <p class="text-[8px] text-gray-500 uppercase tracking-widest mb-6 font-bold">FOUNDER: K. MODISENYANE</p>
+            <div id="auth-form" class="space-y-4">
+                <input type="text" id="auth-user" placeholder="Node ID" class="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-sm outline-none text-white">
+                <input type="password" id="auth-pass" placeholder="Access Key" class="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-sm outline-none text-white">
+                <button onclick="handleAuth()" class="w-full py-4 bg-blue-600 rounded-xl font-black uppercase text-xs text-white">Access Node</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-app" class="hidden">
+        <header class="p-4 glass sticky top-0 z-[1000] flex justify-between items-center border-b border-blue-500/40">
+            <div onclick="toggleModal('info-ui', true)"><h1 class="text-xl font-black italic text-white">MELLO<span class="text-blue-500">9</span></h1></div>
+            <div class="text-right">
+                <div id="wallet-pts" class="text-blue-400 font-bold text-sm">0 PTS</div>
+                <div id="display-name" class="text-[8px] text-gray-500 uppercase font-bold tracking-widest">@USER</div>
+            </div>
+        </header>
+
+        <div id="map"></div>
+
+        <div class="p-4">
+            <div class="glass p-3 rounded-2xl flex gap-2 border border-white/5 mb-4 shadow-lg">
+                <input type="text" id="post-input" placeholder="Broadcast message..." class="flex-1 bg-transparent text-xs outline-none px-2 text-white">
+                <button onclick="submitPost()" class="bg-blue-600 p-2 rounded-lg text-white"><i data-lucide="rss" class="w-4 h-4"></i></button>
+            </div>
+            <div id="post-feed" class="feed-container space-y-3"></div>
+        </div>
+
+        <section class="px-4 mb-6">
+            <div class="p-4 glass rounded-2xl border border-blue-500/20 bg-gradient-to-r from-blue-900/20 to-transparent">
+                <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1">Mellogram House Bank</p>
+                <p class="text-[11px] text-gray-400">20% Network Fee applied to all Voucher Mints.</p>
+            </div>
+        </section>
+
+        <section class="px-4 mb-20">
+            <h2 class="text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-4 italic">Merchant Vault</h2>
+            <div id="merchant-grid" class="grid grid-cols-1 gap-3"></div>
+        </section>
+    </div>
+
+    <div id="topup-ui" class="modal justify-center items-center">
+        <div class="w-full max-w-xs glass p-6 rounded-3xl border border-yellow-500/30">
+            <h3 class="text-sm font-black text-white uppercase mb-4 text-center">Voucher Exchange</h3>
+            <p class="text-[9px] text-gray-500 text-center mb-4 uppercase">User: 80% | House: 20%</p>
+            <select id="network-select" class="w-full bg-black/40 border border-white/10 rounded p-3 text-xs mb-3 text-white">
+                <option value="Vodacom">VODACOM</option>
+                <option value="MTN">MTN</option>
+                <option value="CellC">CELL C</option>
+            </select>
+            <input type="text" id="voucher-pin" placeholder="PIN Number" class="w-full bg-black/40 border border-white/10 rounded p-3 text-xs mb-3 text-white">
+            <input type="number" id="voucher-amount" placeholder="R Value" class="w-full bg-black/40 border border-white/10 rounded p-3 text-xs mb-4 text-white">
+            <button onclick="submitVoucher()" class="w-full py-3 bg-yellow-600 rounded-xl text-xs font-black uppercase text-black">Submit Signal</button>
+            <button onclick="toggleModal('topup-ui', false)" class="w-full mt-2 text-[10px] text-gray-500 uppercase font-bold text-center">Abort</button>
+        </div>
+    </div>
+
+    <div id="info-ui" class="modal">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-xl font-black text-white italic">HOUSE <span class="text-blue-500">BANK</span></h2>
+            <button onclick="toggleModal('info-ui', false)" class="text-gray-500 text-xs font-bold px-4 py-1">EXIT</button>
+        </div>
+        <div class="p-6 glass rounded-3xl border border-blue-500/30 mb-4">
+            <div class="flex justify-between items-end mb-4">
+                <div>
+                    <h3 class="text-[10px] font-bold text-blue-400 uppercase">Treasury Balance</h3>
+                    <p id="treasury-pts" class="text-3xl font-black text-white">0 PTS</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[8px] text-gray-500 uppercase">Total Revenue</p>
+                    <p id="total-rev" class="text-xs font-bold text-white">R0.00</p>
+                </div>
+            </div>
+            <div id="admin-tools" class="hidden space-y-4 pt-4 border-t border-white/10">
+                <h4 class="text-[10px] text-yellow-500 font-bold uppercase">Pending Approvals</h4>
+                <div id="pending-list" class="space-y-2"></div>
+            </div>
+        </div>
+        <button onclick="openAdmin()" class="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-bold uppercase text-white">Master Access (888)</button>
+    </div>
+
+    <footer id="footer-nav" class="fixed bottom-0 left-0 w-full glass border-t border-white/5 p-4 flex justify-around items-center z-[1001] hidden">
+        <div onclick="earn(100)"><i data-lucide="zap" class="w-5 h-5 text-gray-500"></i></div>
+        <div class="h-16 w-16 rounded-full bg-blue-600 flex items-center justify-center -mt-12 border-[6px] border-[#0b0f1a] shadow-2xl" onclick="earn(500)">
+            <i data-lucide="plus" class="text-white w-8 h-8"></i>
+        </div>
+        <div onclick="toggleModal('topup-ui', true)"><i data-lucide="wallet" class="w-5 h-5 text-yellow-500"></i></div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const DB = {
+            get: () => JSON.parse(localStorage.getItem('mello9_treasury')) || { users: {}, merchantItems: [], posts: [], vouchers: [], treasury: 0, totalRevenue: 0 },
+            save: (d) => localStorage.setItem('mello9_treasury', JSON.stringify(d))
+        };
+
+        let state = DB.get();
+        let currentUser = null;
+
+        function handleAuth() {
+            const u = document.getElementById('auth-user').value.toLowerCase();
+            const p = document.getElementById('auth-pass').value;
+            if(!u) return;
+            if(!state.users[u]) { state.users[u] = { pass: p, pts: 1000 }; }
+            if(state.users[u].pass === p) { currentUser = u; launch(); } else { alert("Denied"); }
+        }
+
+        function launch() {
+            document.getElementById('auth-layer').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('footer-nav').classList.remove('hidden');
+            document.getElementById('display-name').innerText = `@${currentUser}`;
+            initMap(); refresh();
+        }
+
+        function refresh() {
+            if(!currentUser) return;
+            document.getElementById('wallet-pts').innerText = `${state.users[currentUser].pts.toLocaleString()} PTS`;
+            document.getElementById('treasury-pts').innerText = `${state.treasury.toLocaleString()} PTS`;
+            document.getElementById('total-rev').innerText = `R${state.totalRevenue.toFixed(2)}`;
+
+            const feed = document.getElementById('post-feed');
+            feed.innerHTML = state.posts.slice().reverse().map(p => `
+                <div class="p-3 glass rounded-xl border border-white/5 mb-2"><div class="flex justify-between mb-1"><span class="text-[9px] font-black text-blue-400">@${p.user}</span><span class="text-[8px] text-gray-700">${p.time}</span></div><p class="text-[11px] text-gray-300">${p.msg}</p></div>
+            `).join('');
+
+            const mGrid = document.getElementById('merchant-grid');
+            mGrid.innerHTML = state.merchantItems.map(i => `
+                <div class="p-4 glass rounded-2xl flex justify-between items-center border-l-4 border-yellow-500">
+                    <div><h3 class="text-xs font-black text-white uppercase italic">${i.name}</h3><p class="text-[8px] text-gray-600 uppercase font-bold">House Asset</p></div>
+                    <button onclick="buyMerchant(${i.id})" class="bg-yellow-500 text-black px-4 py-2 rounded-lg text-[10px] font-black">${i.price} P</button>
+                </div>
+            `).join('');
+
+            const pList = document.getElementById('pending-list');
+            pList.innerHTML = state.vouchers.filter(v => !v.approved).map(v => `
+                <div class="p-3 bg-white/5 rounded-lg border border-white/10 flex justify-between items-center">
+                    <div><p class="text-[10px] font-bold text-white uppercase">${v.network} R${v.amount}</p><p class="text-[8px] font-mono text-blue-400">${v.pin}</p></div>
+                    <button onclick="approveVoucher(${v.id})" class="bg-green-600 text-white text-[8px] px-2 py-1 rounded font-bold uppercase italic italic">Verify & Mint</button>
+                </div>
+            `).join('');
+
+            DB.save(state);
+            lucide.createIcons();
+        }
+
+        function submitVoucher() {
+            const net = document.getElementById('network-select').value;
+            const pin = document.getElementById('voucher-pin').value;
+            const amt = parseInt(document.getElementById('voucher-amount').value);
+            if(!pin || isNaN(amt)) return alert("Missing Info");
+            
+            state.vouchers.push({ id: Date.now(), user: currentUser, network: net, pin: pin, amount: amt, approved: false });
+            state.posts.push({ user: "HOUSE", msg: `🚨 Pending Mint: @${currentUser} requested exchange for R${amt} ${net}.`, time: "SIGNAL" });
+            toggleModal('topup-ui', false); refresh(); alert("Signal Sent.");
+        }
+
+        function approveVoucher(id) {
+            const v = state.vouchers.find(x => x.id === id);
+            if(v) {
+                const totalPts = v.amount * 100;
+                const fee = totalPts * 0.20;
+                const userCredit = totalPts - fee;
+
+                state.users[v.user].pts += userCredit;
+                state.treasury += fee;
+                state.totalRevenue += v.amount;
+                v.approved = true;
+
+                state.posts.push({ user: "HOUSE", msg: `✅ R${v.amount} Verified. Node @${v.user} received ${userCredit} PTS. (20% House Fee applied).`, time: "FINAL" });
+                refresh();
+            }
+        }
+
+        function openAdmin() {
+            if(prompt("MASTER KEY:") === "888") {
+                document.getElementById('admin-tools').classList.remove('hidden');
+                refresh();
+            }
+        }
+
+        function buyMerchant(id) {
+            const item = state.merchantItems.find(x => x.id === id);
+            if(state.users[currentUser].pts >= item.price) {
+                state.users[currentUser].pts -= item.price;
+                state.treasury += item.price; // Merchant sales go to Treasury too
+                refresh(); alert("Purchased.");
+            }
+        }
+
+        function initMap() {
+            const map = L.map('map', { zoomControl: false, attributionControl: false }).setView([-27.01, 27.49], 10);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+        }
+
+        function earn(n) { state.users[currentUser].pts += n; refresh(); }
+        function submitPost() {
+            const m = document.getElementById('post-input').value;
+            if(!m) return;
+            state.posts.push({ user: currentUser, msg: m, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
+            document.getElementById('post-input').value = ''; refresh();
+        }
+        function toggleModal(id, show) { document.getElementById(id).style.display = show ? 'flex' : 'none'; }
+        
+        lucide.createIcons();
+    </script>
+</body>
+</html>

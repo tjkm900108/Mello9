@@ -1,0 +1,14 @@
+# Mobile/OS junk
+.DS_Store
+Thumbs.db
+*.log
+
+# Editor backups
+*.swp
+*~
+.vscode/
+.idea/
+
+# Local database backups (if any)
+*.db
+*.local

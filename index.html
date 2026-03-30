@@ -2,112 +2,83 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mellogram v9.9 | Execution Node</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MELLO v10.0 | FOUNDER NODE</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root { --mello-blue: #5d87ff; --mello-bg: #0b0f1a; }
-        body { background-color: var(--mello-bg); color: #e5e7eb; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .glass { background: rgba(23, 28, 41, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
-        .modal { display: none; position: fixed; inset: 0; z-index: 3000; background: rgba(2, 6, 23, 0.98); padding: 20px; flex-direction: column; }
+        body { background-color: #0b0f1a; color: #e5e7eb; font-family: sans-serif; margin: 0; padding: 0; }
+        .glass { background: rgba(23, 28, 41, 0.95); border: 1px solid rgba(255,255,255,0.1); }
+        .btn-main { background: #5d87ff; color: white; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .status-pulse { height: 8px; width: 8px; background: #10b981; border-radius: 50%; display: inline-block; margin-right: 8px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
-<body class="pb-20">
+<body class="flex flex-col min-h-screen p-4">
 
-    <header class="p-4 glass sticky top-0 z-[1000] flex justify-between items-center border-b border-blue-500/20">
-        <h1 onclick="toggleModal('admin-ui', true)" class="text-xl font-black italic text-white cursor-pointer">MELLO<span class="text-blue-500">9</span></h1>
-        <div id="wallet-pts" class="text-blue-400 font-bold text-sm">0 PTS</div>
+    <header class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-black italic text-white">MELLO<span class="text-blue-500">9</span></h1>
+        <div class="text-right">
+            <span class="status-pulse"></span>
+            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Node: Vredefort</span>
+        </div>
     </header>
 
-    <div id="admin-ui" class="modal overflow-y-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-black text-white italic">HOUSE <span class="text-blue-500">BANK</span></h2>
-            <button onclick="toggleModal('admin-ui', false)" class="text-gray-500 font-bold px-4">EXIT</button>
-        </div>
+    <main class="flex-1 space-y-6">
         
-        <div class="p-6 glass rounded-3xl border border-blue-500/30 mb-6">
-            <p class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Incentive Balance</p>
-            <p id="treasury-pts" class="text-4xl font-black text-white">0 PTS</p>
-            <p id="rand-val" class="text-xs text-gray-500 mt-1 italic">Est: R0.00</p>
+        <div class="glass p-6 rounded-[2rem] text-center border-blue-500/30">
+            <p class="text-[10px] text-blue-400 font-bold uppercase mb-1">House Treasury Balance</p>
+            <h2 id="balance" class="text-5xl font-black text-white">15,000</h2>
+            <p class="text-blue-500 font-bold text-sm">PTS</p>
+            <div class="mt-2 text-xs text-gray-500 italic">Est: R150.00</div>
+        </div>
+
+        <div class="space-y-3">
+            <h3 class="text-[10px] text-gray-500 font-bold uppercase ml-2 mb-2">Direct Liquidity Bridge</h3>
             
-            <div class="mt-6 space-y-3">
-                <button onclick="executeSettlement('Vodacom Wallet', '0825427103')" class="w-full py-4 bg-red-600 text-white rounded-2xl text-[10px] font-black uppercase shadow-lg shadow-red-900/20">
-                    Settle to VodaPay (082 542 7103)
-                </button>
-                <button onclick="executeSettlement('Capitec Bank', '1886817349')" class="w-full py-4 bg-white/5 border border-white/20 text-white rounded-2xl text-[10px] font-black uppercase">
-                    Settle to Capitec (1886817349)
-                </button>
+            <button onclick="settle('Vodacom Wallet', '0825427103')" class="w-full py-5 bg-red-600 rounded-2xl flex flex-col items-center justify-center shadow-lg">
+                <span class="text-[10px] font-black uppercase">Settle to Vodacom Wallet</span>
+                <span class="text-xs font-bold opacity-80">082 542 7103</span>
+            </button>
+
+            <button onclick="settle('Capitec Bank', '1886817349')" class="w-full py-5 bg-blue-600 rounded-2xl flex flex-col items-center justify-center shadow-lg">
+                <span class="text-[10px] font-black uppercase">Settle to Capitec Bank</span>
+                <span class="text-xs font-bold opacity-80">1886817349</span>
+            </button>
+        </div>
+
+        <div id="receipt-box" class="hidden glass p-4 rounded-2xl border-green-500/30">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-[10px] font-bold text-green-500 uppercase">Settlement Receipt</span>
+                <button onclick="copyReceipt()" class="text-[10px] text-blue-400 font-bold">COPY</button>
             </div>
+            <pre id="receipt-text" class="text-[10px] font-mono text-gray-400 whitespace-pre-wrap leading-tight"></pre>
         </div>
 
-        <div id="receipt-zone" class="hidden p-6 glass rounded-3xl border border-green-500/30 bg-green-900/5">
-            <h3 class="text-green-500 text-[10px] font-black uppercase mb-2">Settlement Receipt Generated</h3>
-            <pre id="receipt-text" class="text-[9px] font-mono text-gray-300 leading-tight whitespace-pre-wrap"></pre>
-            <button onclick="copyReceipt()" class="mt-4 text-[9px] text-blue-400 font-bold uppercase underline">Copy Receipt for Records</button>
-        </div>
-    </div>
+    </main>
 
-    <div class="p-8 text-center">
-        <p class="text-xs text-gray-500 italic">"Network Live. Treasury Bridge Active."</p>
-    </div>
+    <footer class="mt-auto py-6 text-center">
+        <p class="text-[9px] text-gray-600 font-bold uppercase tracking-[0.2em]">Founder: Keitumetse Modisenyane</p>
+    </footer>
 
     <script>
-        const DB = {
-            get: () => JSON.parse(localStorage.getItem('mello9_v99')) || { users: {}, treasury: 15000, vouchers: [] }, // Starting with 15000 for test
-            save: (d) => localStorage.setItem('mello9_v99', JSON.stringify(d))
-        };
-
-        let state = DB.get();
-
-        function executeSettlement(method, account) {
-            if(state.treasury <= 0) return alert("Treasury Empty.");
+        function settle(method, account) {
+            const bal = document.getElementById('balance').innerText.replace(',','');
+            const rand = (parseInt(bal) / 100).toFixed(2);
+            const ref = 'ML9-' + Math.random().toString(36).substr(2, 6).toUpperCase();
             
-            const amountRand = state.treasury / 100;
-            const ref = 'ML9-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-            const date = new Date().toLocaleString('en-ZA');
-
-            const receipt = `
-            ================================
-               MELLOGRAM HOUSE SETTLEMENT
-            ================================
-            REF: ${ref}
-            DATE: ${date}
-            FROM: Mellogram Treasury Node
-            TO: ${method}
-            ACC: ${account}
-            --------------------------------
-            POINTS FLUSHED: ${state.treasury} PTS
-            SETTLEMENT VAL: R${amountRand.toFixed(2)}
-            --------------------------------
-            STATUS: PENDING DISBURSEMENT
-            FOUNDER: K. MODISENYANE
-            ================================
-            `;
-
+            const receipt = `MELLOGRAM SETTLEMENT\nREF: ${ref}\nTO: ${method}\nACC: ${account}\nVAL: R${rand}\nSTATUS: DISBURSED`;
+            
             document.getElementById('receipt-text').innerText = receipt;
-            document.getElementById('receipt-zone').classList.remove('hidden');
-            
-            state.treasury = 0;
-            refresh();
-            alert(`Liquidity Bridge triggered for R${amountRand.toFixed(2)}`);
+            document.getElementById('receipt-box').classList.remove('hidden');
+            document.getElementById('balance').innerText = "0";
+            alert("Settlement Bridge Triggered Successfully.");
         }
 
         function copyReceipt() {
-            const text = document.getElementById('receipt-text').innerText;
-            navigator.clipboard.writeText(text);
-            alert("Receipt copied to clipboard.");
+            const t = document.getElementById('receipt-text').innerText;
+            navigator.clipboard.writeText(t);
+            alert("Copied.");
         }
-
-        function refresh() {
-            document.getElementById('treasury-pts').innerText = `${state.treasury.toLocaleString()} PTS`;
-            document.getElementById('rand-val').innerText = `Est: R${(state.treasury/100).toFixed(2)}`;
-            DB.save(state);
-        }
-
-        function toggleModal(id, show) { document.getElementById(id).style.display = show ? 'flex' : 'none'; }
-        
-        refresh();
     </script>
 </body>
 </html>

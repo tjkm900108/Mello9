@@ -3,113 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mellogram v10.5 | Master Node</title>
+    <title>Mellogram v11.0 | MASTER FOUNDER NODE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root { --mello-blue: #5d87ff; --mello-bg: #0b0f1a; }
-        body { background-color: var(--mello-bg); color: #e5e7eb; font-family: 'Inter', sans-serif; overflow-x: hidden; margin: 0; padding-bottom: 100px; }
-        #map { height: 200px; width: 100%; filter: saturate(1.2) brightness(0.7); border-bottom: 2px solid var(--mello-blue); }
+        body { background-color: var(--mello-bg); color: #e5e7eb; font-family: sans-serif; margin: 0; padding-bottom: 110px; overflow-x: hidden; }
         .glass { background: rgba(23, 28, 41, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
-        .modal { display: none; position: fixed; inset: 0; z-index: 3000; background: rgba(2, 6, 23, 0.98); padding: 20px; flex-direction: column; overflow-y: auto; }
-        .auth-screen { position: fixed; inset: 0; z-index: 4000; background: #0b0f1a; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .feed-container { max-height: 400px; overflow-y: auto; }
-        .reaction-btn { transition: all 0.2s; cursor: pointer; }
-        .reaction-btn:active { transform: scale(1.3); }
+        .modal { display: none; position: fixed; inset: 0; z-index: 5000; background: #0b0f1a; padding: 20px; flex-direction: column; overflow-y: auto; }
+        #map { height: 200px; width: 100%; filter: saturate(1.2) brightness(0.6); border-bottom: 2px solid var(--mello-blue); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .founder-tag { background: linear-gradient(90deg, #5d87ff, #b45309); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; }
     </style>
 </head>
 <body>
 
-    <div id="auth-layer" class="auth-screen">
-        <div class="w-full max-w-sm glass p-8 rounded-3xl border border-blue-500/20 text-center">
-            <h1 class="text-3xl font-black text-white italic mb-2">MELLO<span class="text-blue-500">9</span></h1>
-            <p class="text-[8px] text-gray-500 uppercase tracking-widest mb-6 font-bold">© 2026 FOUNDER EDITION</p>
-            <div id="auth-form" class="space-y-4">
-                <input type="text" id="auth-user" placeholder="Node ID" class="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-sm outline-none text-white">
-                <input type="password" id="auth-pass" placeholder="Access Key" class="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-sm outline-none text-white">
-                <button onclick="handleAuth()" class="w-full py-4 bg-blue-600 rounded-xl font-black uppercase text-xs">Enter System</button>
-                <p class="text-[10px] text-gray-500 cursor-pointer" onclick="toggleAuthMode()">Register Global ID</p>
+    <div id="auth-layer" class="fixed inset-0 z-[6000] bg-[#0b0f1a] flex items-center justify-center p-6">
+        <div class="w-full max-w-sm glass p-8 rounded-[2.5rem] border-blue-500/20 text-center">
+            <h1 class="text-4xl font-black italic mb-2">MELLO<span class="text-blue-500">9</span></h1>
+            <p class="text-[8px] text-gray-500 uppercase tracking-[0.4em] mb-8 font-bold text-center">© 2026 KEITUMETSE MODISENYANE</p>
+            <div class="space-y-4">
+                <input type="text" id="auth-user" placeholder="Node ID" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none">
+                <input type="password" id="auth-pass" placeholder="Access Key" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm outline-none">
+                <button onclick="handleAuth()" class="w-full py-4 bg-blue-600 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-blue-500/20">Access Master Node</button>
+                <p class="text-[10px] text-gray-500 uppercase font-bold cursor-pointer" onclick="alert('Registration Syncing...')">Register Global ID</p>
             </div>
         </div>
     </div>
 
     <div id="main-app" class="hidden">
-        <header class="p-4 glass sticky top-0 z-[1000] flex justify-between items-center border-b border-blue-500/40">
+        <header class="p-4 glass sticky top-0 z-[1000] flex justify-between items-center border-b border-blue-500/30">
             <div onclick="toggleModal('info-ui', true)"><h1 class="text-xl font-black italic">MELLO<span class="text-blue-500">9</span></h1></div>
             <div class="text-right">
-                <div id="wallet-pts" class="text-blue-400 font-bold text-sm tracking-tighter">0 PTS</div>
+                <div id="wallet-pts" class="text-blue-400 font-black text-sm tracking-tighter">0 PTS</div>
                 <div id="display-name" class="text-[8px] text-gray-500 uppercase font-bold tracking-widest">@USER</div>
             </div>
         </header>
 
         <div id="map"></div>
 
-        <div class="p-4">
-            <div class="glass p-5 rounded-3xl border-blue-500/30">
-                <p class="text-[9px] text-gray-500 font-bold uppercase mb-3 text-center">Voucher Liquidity Node (20% Fee)</p>
+        <div class="p-4 space-y-4">
+            <div class="glass p-5 rounded-3xl border-blue-500/20">
+                <p class="text-[9px] text-gray-500 font-bold uppercase mb-3 text-center tracking-widest italic text-blue-400">Treasury Conversion (20% Fee)</p>
                 <div class="flex gap-2 mb-4">
                     <input type="text" id="voucher-code" placeholder="Enter Airtime/Voucher" class="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs outline-none">
-                    <button onclick="convertVoucher()" class="bg-green-600 px-6 py-3 rounded-xl font-black text-[10px] uppercase">MINT</button>
+                    <button onclick="convertVoucher()" class="bg-blue-600 px-6 py-3 rounded-xl font-black text-[10px] uppercase">MINT</button>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="settle('Vodacom', '0825427103')" class="flex-1 py-3 bg-red-600 rounded-xl text-[9px] font-black uppercase">Voda Bridge</button>
-                    <button onclick="settle('Capitec', '1886817349')" class="flex-1 py-3 bg-blue-600 rounded-xl text-[9px] font-black uppercase">Capitec Bridge</button>
+                    <button onclick="settle('Vodacom', '0825427103')" class="flex-1 py-3 bg-red-600 rounded-xl text-[9px] font-black uppercase shadow-lg">VodaPay Bridge</button>
+                    <button onclick="settle('Capitec', '1886817349')" class="flex-1 py-3 bg-blue-600 rounded-xl text-[9px] font-black uppercase shadow-lg">Capitec Bridge</button>
                 </div>
             </div>
-        </div>
 
-        <div class="px-4 pb-24">
-            <div class="glass p-3 rounded-2xl flex gap-2 border border-white/5 mb-6">
-                <input type="text" id="post-input" placeholder="Update network status..." class="flex-1 bg-transparent text-xs outline-none px-2 text-white">
-                <button onclick="submitPost()" class="bg-blue-600 p-2 rounded-lg text-white"><i data-lucide="send" class="w-4 h-4"></i></button>
+            <div class="glass p-3 rounded-2xl flex gap-2 border border-white/5 shadow-xl">
+                <input type="text" id="post-input" placeholder="Broadcast to network..." class="flex-1 bg-transparent text-xs outline-none px-2">
+                <button onclick="submitPost()" class="bg-blue-600 p-2 rounded-lg"><i data-lucide="rss" class="w-4 h-4 text-white"></i></button>
             </div>
-
-            <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Satellite Feed & Reactions</h2>
-            <div id="post-feed" class="space-y-4"></div>
+            <div id="post-feed" class="space-y-4 pb-20"></div>
         </div>
     </div>
 
-    <div id="info-ui" class="modal text-white">
+    <div id="store-ui" class="modal">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-black italic text-white uppercase">Mint <span class="text-blue-500">Store</span></h2>
+            <button onclick="toggleModal('store-ui', false)" class="p-2 glass rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="flex gap-2 overflow-x-auto pb-4 no-scrollbar mb-4">
+            <button onclick="filterStore('Groceries')" class="px-5 py-2 glass rounded-xl text-[10px] font-black uppercase whitespace-nowrap text-blue-400">Groceries</button>
+            <button onclick="filterStore('Gadgets')" class="px-5 py-2 glass rounded-xl text-[10px] font-black uppercase whitespace-nowrap text-blue-400">Gadgets</button>
+            <button onclick="filterStore('Tech')" class="px-5 py-2 glass rounded-xl text-[10px] font-black uppercase whitespace-nowrap text-blue-400">Tech</button>
+            <button onclick="filterStore('Clothing')" class="px-5 py-2 glass rounded-xl text-[10px] font-black uppercase whitespace-nowrap text-blue-400">Clothing</button>
+            <button onclick="filterStore('Music')" class="px-5 py-2 glass rounded-xl text-[10px] font-black uppercase whitespace-nowrap text-blue-400">Music</button>
+            <button onclick="filterStore('Tickets')" class="px-5 py-2 glass rounded-xl text-[10px] font-black uppercase whitespace-nowrap text-blue-400">Tickets</button>
+        </div>
+        <div id="store-grid" class="grid grid-cols-2 gap-3 pb-24"></div>
+    </div>
+
+    <div id="checkout-ui" class="modal">
+        <h2 class="text-2xl font-black mb-6 uppercase text-blue-500 italic">Dispatch Order</h2>
+        <div class="space-y-4">
+            <div id="order-summary" class="p-6 glass rounded-3xl border-blue-500/30"></div>
+            <input type="text" id="cust-name" placeholder="Founder Name" class="w-full bg-white/5 p-4 rounded-2xl outline-none border border-white/10">
+            <input type="text" id="cust-contact" placeholder="WhatsApp / Call" class="w-full bg-white/5 p-4 rounded-2xl outline-none border border-white/10">
+            <textarea id="cust-loc" placeholder="Delivery Address (Vredefort)" class="w-full bg-white/5 p-4 rounded-2xl outline-none border border-white/10 h-28"></textarea>
+            <button onclick="confirmOrder()" class="w-full py-5 bg-blue-600 rounded-2xl font-black uppercase tracking-widest shadow-xl">Confirm Order (-20% Fee)</button>
+            <button onclick="toggleModal('checkout-ui', false)" class="w-full py-2 text-gray-500 text-xs font-bold uppercase">Back to Store</button>
+        </div>
+    </div>
+
+    <div id="info-ui" class="modal">
         <div class="flex justify-between items-center mb-8">
             <h2 class="text-xl font-black italic">NODE <span class="text-blue-500">INTEL</span></h2>
-            <button onclick="toggleModal('info-ui', false)" class="text-gray-500 text-xs font-bold border border-white/10 px-4 py-1 rounded-full">CLOSE</button>
+            <button onclick="toggleModal('info-ui', false)" class="text-gray-500 text-xs font-bold border border-white/10 px-4 py-1 rounded-full uppercase">Close</button>
         </div>
-        <div id="user-profile" class="glass p-6 rounded-3xl border border-blue-500/30 mb-6"></div>
-        <button onclick="openAdmin()" class="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-bold uppercase tracking-widest">Master Console (888)</button>
+        <div id="profile-card" class="glass p-8 rounded-[2.5rem] border-blue-500/30 text-center mb-6"></div>
+        <button onclick="openAdmin()" class="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest">Master Console (888)</button>
     </div>
 
-    <footer id="footer-nav" class="fixed bottom-0 left-0 w-full glass border-t border-white/5 p-4 flex justify-around items-center z-[1001] hidden text-white">
-        <div onclick="earn(100)"><i data-lucide="zap" class="w-5 h-5"></i></div>
-        <div class="h-16 w-16 rounded-full bg-blue-600 flex items-center justify-center -mt-12 border-[6px] border-[#0b0f1a]" onclick="toggleModal('info-ui', true)">
-            <i data-lucide="user" class="text-white w-6 h-6"></i>
+    <footer id="footer-nav" class="fixed bottom-0 left-0 w-full glass border-t border-white/5 p-4 flex justify-around items-center z-[1001] hidden">
+        <div onclick="location.reload()"><i data-lucide="zap" class="w-5 h-5 text-gray-500"></i></div>
+        <div class="h-16 w-16 rounded-full bg-blue-600 flex items-center justify-center -mt-12 border-[6px] border-[#0b0f1a] shadow-2xl" onclick="toggleModal('store-ui', true)">
+            <i data-lucide="shopping-bag" class="text-white w-6 h-6"></i>
         </div>
-        <div onclick="alert('Store Redirecting...')"><i data-lucide="shopping-bag" class="w-5 h-5"></i></div>
+        <div onclick="toggleModal('info-ui', true)"><i data-lucide="user" class="w-5 h-5 text-gray-500"></i></div>
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const DB = {
-            get: () => JSON.parse(localStorage.getItem('mello_master_v10')) || { users: {}, posts: [] },
-            save: (d) => localStorage.setItem('mello_master_v10', JSON.stringify(d))
+            get: () => JSON.parse(localStorage.getItem('mello_v11')) || { users: {}, posts: [], storeItems: [
+                {id:1, name:"Groceries Pack", cat:"Groceries", price:250, img:"📦"},
+                {id:2, name:"Hyper Gadget", cat:"Gadgets", price:1200, img:"⚡"},
+                {id:3, name:"Tech Node", cat:"Tech", price:3500, img:"💻"},
+                {id:4, name:"Founder Hoodie", cat:"Clothing", price:450, img:"🧥"},
+                {id:5, name:"Mello Beats", cat:"Music", price:80, img:"🎵"},
+                {id:6, name:"Event Ticket", cat:"Tickets", price:150, img:"🎫"}
+            ]},
+            save: (d) => localStorage.setItem('mello_v11', JSON.stringify(d))
         };
 
         let state = DB.get();
         let currentUser = null;
-        let isReg = false;
+        let selectedProduct = null;
 
         function handleAuth() {
             const u = document.getElementById('auth-user').value.toLowerCase();
             const p = document.getElementById('auth-pass').value;
             if(!u) return;
-            if(isReg) {
-                state.users[u] = { pass: p, pts: 1000, profile: { bio: "Network Member", joined: "2026" } };
-                DB.save(state); toggleAuthMode();
-            } else {
-                if(state.users[u] && state.users[u].pass === p) { currentUser = u; launch(); }
-                else if(u === 'founder' && p === '888') { state.users[u] = {pass:'888', pts:9999, profile: {bio: "FOUNDER NODE", joined: "2026"}}; currentUser=u; launch(); }
-                else alert("Denied");
-            }
+            // Standard User Auto-Reg for Beta
+            if(!state.users[u]) state.users[u] = { pass: p, pts: 3000, profile: "Network Node" };
+            if(state.users[u].pass === p) { currentUser = u; launch(); }
+            else alert("Access Denied");
         }
 
         function launch() {
@@ -124,51 +149,60 @@
             if(!currentUser) return;
             document.getElementById('wallet-pts').innerText = `${state.users[currentUser].pts.toLocaleString()} PTS`;
             
-            // FEED REFRESH WITH REACTIONS
             const feed = document.getElementById('post-feed');
             feed.innerHTML = state.posts.slice().reverse().map((p, idx) => `
-                <div class="p-4 glass rounded-2xl border border-white/5 shadow-xl">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[10px] font-black text-blue-500 uppercase tracking-tighter">@${p.user}</span>
-                        <span class="text-[8px] text-gray-600 font-bold uppercase">Signal Verified</span>
-                    </div>
-                    <p class="text-xs text-gray-200 leading-relaxed mb-4">${p.msg}</p>
-                    <div class="flex gap-4 border-t border-white/5 pt-3">
-                        <div onclick="react(${state.posts.length - 1 - idx}, 'like')" class="reaction-btn flex items-center gap-1">
-                            <i data-lucide="heart" class="w-3 h-3 text-red-500"></i>
-                            <span class="text-[9px] font-bold">${p.likes || 0}</span>
-                        </div>
-                        <div class="flex items-center gap-1 opacity-50">
-                            <i data-lucide="message-circle" class="w-3 h-3"></i>
-                            <span class="text-[9px]">0</span>
-                        </div>
+                <div class="glass p-5 rounded-3xl border border-white/5 shadow-2xl">
+                    <div class="flex justify-between items-center mb-3 text-blue-500 font-black text-[10px] uppercase">@${p.user}</div>
+                    <p class="text-xs text-gray-200 mb-4">${p.msg}</p>
+                    <div class="flex gap-6 border-t border-white/5 pt-4">
+                        <div onclick="react(${state.posts.length - 1 - idx})" class="flex items-center gap-2 text-[10px] font-bold"><i data-lucide="heart" class="w-3 h-3 text-red-500"></i> ${p.likes || 0}</div>
+                        <div class="flex items-center gap-2 text-[10px] font-bold opacity-30"><i data-lucide="message-square" class="w-3 h-3"></i> 0</div>
                     </div>
                 </div>
             `).join('');
 
-            // PROFILE REFRESH
-            const prof = document.getElementById('user-profile');
-            const uData = state.users[currentUser];
-            prof.innerHTML = `<h3 class="text-2xl font-black italic uppercase">@${currentUser}</h3><p class="text-xs text-blue-400 font-bold mb-4 uppercase tracking-widest">${uData.profile.bio}</p><div class="text-[10px] space-y-1 opacity-60 uppercase font-bold"><div>MEMBER SINCE: ${uData.profile.joined}</div><div>NODE: VREDEFORT_01</div></div>`;
+            const prof = document.getElementById('profile-card');
+            prof.innerHTML = `<h3 class="text-3xl font-black italic uppercase mb-2">@${currentUser}</h3><p class="founder-tag uppercase text-xs tracking-[0.2em] mb-4">${state.users[currentUser].profile}</p><div class="p-4 glass rounded-2xl text-[9px] font-mono text-gray-500 uppercase tracking-widest leading-loose">Verified Node ID: ML9-${currentUser.toUpperCase()}<br>Location: Vredefort Sector</div>`;
             
             DB.save(state); lucide.createIcons();
         }
 
-        function react(postIdx, type) {
-            if(!state.posts[postIdx].likes) state.posts[postIdx].likes = 0;
-            state.posts[postIdx].likes++;
-            earn(5); // Reward for reacting
-            refresh();
+        function filterStore(cat) {
+            const grid = document.getElementById('store-grid');
+            const items = state.storeItems.filter(p => p.cat === cat);
+            grid.innerHTML = items.map(p => `
+                <div onclick="openCheckout(${p.id})" class="glass p-6 rounded-[2rem] text-center border-white/5 active:scale-95 transition-transform">
+                    <div class="text-4xl mb-3">${p.img}</div>
+                    <h4 class="text-[10px] font-black uppercase text-white mb-1">${p.name}</h4>
+                    <p class="text-blue-400 font-black text-xs italic">${p.price} PTS</p>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function openCheckout(id) {
+            selectedProduct = state.storeItems.find(x => x.id === id);
+            document.getElementById('order-summary').innerHTML = `<p class="text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest italic">Selected Asset</p><h4 class="text-xl font-black italic uppercase text-white mb-2">${selectedProduct.name}</h4><div class="text-2xl font-black text-blue-500">${selectedProduct.price} PTS</div>`;
+            toggleModal('checkout-ui', true);
+        }
+
+        function confirmOrder() {
+            const n = document.getElementById('cust-name').value;
+            const l = document.getElementById('cust-loc').value;
+            if(!n || !l) return alert("Validation Failed: Enter Name & Location");
+            if(state.users[currentUser].pts < selectedProduct.price) return alert("Insufficient Liquidity");
+            
+            state.users[currentUser].pts -= selectedProduct.price;
+            alert(`ORDER CAPTURED\nFounder: ${n}\nItem: ${selectedProduct.name}\nSystem deducting 20% logistics fee...`);
+            toggleModal('checkout-ui', false); toggleModal('store-ui', false); refresh();
         }
 
         function convertVoucher() {
             const code = document.getElementById('voucher-code').value;
-            if(code.length < 5) return alert("Invalid Code");
-            const rawVal = 1000; // Assume R10 voucher
-            const fee = rawVal * 0.20; // 20% Fee logic
-            const final = rawVal - fee;
-            state.users[currentUser].pts += final;
-            alert(`MINT SUCCESS\nRaw: ${rawVal} PTS\nHouse Fee (20%): -${fee}\nNet: ${final} PTS`);
+            if(code.length < 5) return;
+            const val = 1000; const fee = val * 0.20; const net = val - fee;
+            state.users[currentUser].pts += net;
+            alert(`VOUCHER MINTED\nHouse Fee (20%): -${fee} PTS\nCredited: ${net} PTS`);
             document.getElementById('voucher-code').value = ''; refresh();
         }
 
@@ -184,10 +218,11 @@
             document.getElementById('post-input').value = ''; earn(10); refresh();
         }
 
+        function react(idx) { if(!state.posts[idx].likes) state.posts[idx].likes = 0; state.posts[idx].likes++; refresh(); }
         function earn(n) { state.users[currentUser].pts += n; refresh(); }
-        function settle(m, a) { alert(`BRIDGE: ${m} to ${a} pending.`); }
-        function toggleAuthMode() { isReg = !isReg; document.querySelector('#auth-form button').innerText = isReg ? 'Register ID' : 'Enter System'; }
-        function toggleModal(id, show) { document.getElementById(id).style.display = show ? 'flex' : 'none'; }
+        function settle(m, a) { alert(`Bridge triggered to ${a} via ${m}.`); }
+        function toggleModal(id, show) { document.getElementById(id).style.display = show ? 'flex' : 'none'; if(id==='store-ui' && show) filterStore('Groceries'); }
+        function openAdmin() { if(prompt("MASTER KEY:")==="888") { alert("Console Unlocked."); } }
     </script>
 </body>
 </html>

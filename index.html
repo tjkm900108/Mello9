@@ -1,126 +1,338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mellogram v10.8 | Founder Store</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>Mellogram v10.9 | Digital Economic Ecosystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root { --mello-blue: #5d87ff; --mello-bg: #0b0f1a; }
-        body { background-color: var(--mello-bg); color: #e5e7eb; font-family: sans-serif; margin: 0; padding-bottom: 100px; }
-        .glass { background: rgba(23, 28, 41, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
-        .modal { display: none; position: fixed; inset: 0; z-index: 5000; background: #0b0f1a; padding: 20px; flex-direction: column; overflow-y: auto; }
-        #map { height: 180px; width: 100%; filter: saturate(1.2) brightness(0.6); }
-        .store-card { transition: transform 0.2s; border: 1px solid rgba(255,255,255,0.05); }
-        .store-card:active { transform: scale(0.95); }
+        :root { 
+            --mello-blue: #5d87ff; 
+            --mello-bg: #0b0f1a;
+            --mello-card: #171c29;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background-color: var(--mello-bg); 
+            color: #e5e7eb; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .glass { 
+            background: rgba(23, 28, 41, 0.96); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        
+        .modal { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            z-index: 5000; 
+            background: rgba(11, 15, 26, 0.98);
+            padding: 20px; 
+            flex-direction: column; 
+            overflow-y: auto;
+        }
+        
+        .modal.active { display: flex; }
+        .view { display: none; padding-bottom: 120px; min-height: 100vh; }
+        .view.active { display: block; animation: fadeIn 0.3s ease-out; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        input, textarea, select { 
+            background: rgba(255,255,255,0.05) !important; 
+            border: 1px solid rgba(255,255,255,0.1) !important; 
+            color: white !important;
+        }
+
+        .carousel-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 16px;
+            scroll-snap-type: x mandatory;
+            padding: 10px 0;
+        }
+        
+        .carousel-item {
+            flex: 0 0 160px;
+            scroll-snap-align: start;
+        }
+
+        .tab-active { 
+            border-bottom: 2px solid #5d87ff;
+            color: #5d87ff !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #5d87ff, #3d67cf);
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:active { transform: scale(0.95); }
+
+        nav button.active { color: #5d87ff; }
     </style>
 </head>
 <body>
 
-    <div id="main-app">
-        <header class="p-4 glass sticky top-0 z-[1000] flex justify-between items-center border-b border-blue-500/40">
+    <div id="auth-view" class="view active flex flex-col justify-center p-6">
+        <div class="max-w-md mx-auto w-full">
+            <div class="text-center mb-10">
+                <h1 class="text-6xl font-black italic mb-2 tracking-tighter">MELLO<span class="text-blue-500">9</span></h1>
+                <p class="text-gray-500 text-[10px] uppercase tracking-[0.3em]">Digital Economic Ecosystem</p>
+            </div>
+
+            <div class="glass rounded-3xl p-6 mb-8 shadow-2xl">
+                <div class="flex gap-4 mb-8 border-b border-white/5">
+                    <button onclick="switchAuthTab('login')" id="login-tab" class="flex-1 py-3 text-xs font-black uppercase tab-active">Login</button>
+                    <button onclick="switchAuthTab('register')" id="register-tab" class="flex-1 py-3 text-xs font-black uppercase text-gray-500">Register</button>
+                </div>
+
+                <div id="login-form" class="space-y-4">
+                    <input type="email" placeholder="Email Address" class="w-full p-4 rounded-2xl outline-none text-sm">
+                    <input type="password" placeholder="Password" class="w-full p-4 rounded-2xl outline-none text-sm">
+                    <button onclick="app.login()" class="w-full py-4 btn-primary rounded-2xl font-black uppercase text-white">Access Portal</button>
+                </div>
+
+                <div id="register-form" class="space-y-4 hidden">
+                    <input type="text" placeholder="Username" class="w-full p-4 rounded-2xl outline-none text-sm">
+                    <input type="email" placeholder="Email" class="w-full p-4 rounded-2xl outline-none text-sm">
+                    <input type="password" placeholder="Password" class="w-full p-4 rounded-2xl outline-none text-sm">
+                    <select class="w-full p-4 rounded-2xl outline-none text-sm appearance-none">
+                        <option value="ng">Nigeria</option>
+                        <option value="za">South Africa</option>
+                        <option value="us">USA</option>
+                    </select>
+                    <button onclick="app.login()" class="w-full py-4 btn-primary rounded-2xl font-black uppercase text-white">Create Identity</button>
+                </div>
+            </div>
+
+            <button onclick="app.login('Guest')" class="w-full text-blue-400 text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition">Enter as Guest Explorer</button>
+        </div>
+    </div>
+
+    <div id="main-app" class="view">
+        <header class="p-4 glass sticky top-0 z-[1000] flex justify-between items-center border-b border-white/5">
             <h1 class="text-xl font-black italic">MELLO<span class="text-blue-500">9</span></h1>
-            <div id="wallet-pts" class="text-blue-400 font-bold text-sm">0 PTS</div>
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <p class="text-[8px] uppercase text-gray-500 font-bold">Balance</p>
+                    <p id="header-pts" class="text-blue-400 font-black text-xs">0 PTS</p>
+                </div>
+                <button onclick="app.toggleModal('profile-modal', true)" class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center font-black border-2 border-white/10">
+                    <span id="user-avatar">U</span>
+                </button>
+            </div>
         </header>
 
-        <div id="map"></div>
-        
-        <main id="feed-view" class="p-4 space-y-4">
-             <div class="glass p-5 rounded-3xl text-center border-blue-500/20">
-                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Network Status</p>
-                <h2 class="text-sm font-black italic text-blue-400">VREDEFORT NODE ACTIVE</h2>
-             </div>
+        <main class="p-4 max-w-2xl mx-auto space-y-6">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="glass p-4 rounded-2xl border-l-4 border-blue-500">
+                    <p class="text-[10px] uppercase text-gray-500 font-black">Rank</p>
+                    <p id="stat-rank" class="text-lg font-black text-white">Loading...</p>
+                </div>
+                <div class="glass p-4 rounded-2xl border-l-4 border-green-500">
+                    <p class="text-[10px] uppercase text-gray-500 font-black">Daily Earn</p>
+                    <p class="text-lg font-black text-white">+12.5%</p>
+                </div>
+            </div>
+
+            <div class="space-y-4" id="global-feed">
+                </div>
         </main>
     </div>
 
-    <div id="store-ui" class="modal">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-black italic text-white">MINT <span class="text-blue-500">STORE</span></h2>
-            <button onclick="toggleModal('store-ui', false)" class="p-2 glass rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
-        </div>
-
-        <div class="flex gap-2 overflow-x-auto pb-4 no-scrollbar">
-            <button onclick="filterStore('Groceries')" class="px-4 py-2 glass rounded-xl text-[10px] font-black uppercase whitespace-nowrap">Groceries</button>
-            <button onclick="filterStore('Tech')" class="px-4 py-2 glass rounded-xl text-[10px] font-black uppercase whitespace-nowrap">Tech</button>
-            <button onclick="filterStore('Clothing')" class="px-4 py-2 glass rounded-xl text-[10px] font-black uppercase whitespace-nowrap">Clothing</button>
-            <button onclick="filterStore('Tickets')" class="px-4 py-2 glass rounded-xl text-[10px] font-black uppercase whitespace-nowrap">Tickets</button>
-        </div>
-
-        <div id="store-grid" class="grid grid-cols-2 gap-3 pb-20">
+    <div id="store-view" class="view">
+        <header class="p-4 glass sticky top-0 z-[1000] border-b border-white/5">
+            <h1 class="text-xl font-black italic text-center">MELLO<span class="text-blue-500">STORE</span></h1>
+        </header>
+        <main class="p-4 max-w-2xl mx-auto space-y-6">
+            <div class="glass p-6 rounded-3xl border-yellow-500/20">
+                <h3 class="text-xs font-black uppercase text-yellow-500 mb-4 flex items-center gap-2">
+                    <i data-lucide="ticket" class="w-4 h-4"></i> Voucher Terminal
+                </h3>
+                <input type="text" id="v-pin" placeholder="Enter Voucher PIN" class="w-full p-4 rounded-2xl mb-3 text-sm">
+                <button onclick="app.redeemVoucher()" class="w-full py-3 bg-yellow-600 rounded-xl font-black text-xs uppercase">Validate & Credit</button>
             </div>
+            <div id="store-grid" class="grid grid-cols-2 gap-4"></div>
+        </main>
     </div>
 
-    <div id="checkout-ui" class="modal">
-        <h2 class="text-xl font-black mb-6 uppercase">Order Dispatch</h2>
-        <div class="space-y-4">
-            <div id="order-summary" class="p-4 glass rounded-2xl border-blue-500/30"></div>
-            <input type="text" id="cust-name" placeholder="Full Name" class="w-full bg-white/5 p-4 rounded-xl outline-none border border-white/10">
-            <input type="text" id="cust-contact" placeholder="WhatsApp / Cell Number" class="w-full bg-white/5 p-4 rounded-xl outline-none border border-white/10">
-            <textarea id="cust-loc" placeholder="Delivery Address (Vredefort)" class="w-full bg-white/5 p-4 rounded-xl outline-none border border-white/10 h-24"></textarea>
-            <button onclick="confirmOrder()" class="w-full py-4 bg-blue-600 rounded-2xl font-black uppercase">Confirm Order (-20% House Fee)</button>
-            <button onclick="toggleModal('checkout-ui', false)" class="w-full py-2 text-gray-500 text-xs font-bold uppercase">Cancel</button>
-        </div>
-    </div>
-
-    <nav class="fixed bottom-0 w-full glass p-4 flex justify-around items-center z-[1001] border-t border-white/10">
-        <div onclick="location.reload()"><i data-lucide="home" class="w-5 h-5 text-gray-500"></i></div>
-        <div class="h-16 w-16 rounded-full bg-blue-600 flex items-center justify-center -mt-12 border-[6px] border-[#0b0f1a] shadow-2xl" onclick="toggleModal('store-ui', true)">
-            <i data-lucide="shopping-cart" class="text-white w-6 h-6"></i>
-        </div>
-        <div onclick="toggleModal('info-ui', true)"><i data-lucide="user" class="w-5 h-5 text-gray-500"></i></div>
+    <nav id="app-nav" class="fixed bottom-0 w-full glass p-3 hidden border-t border-white/10 z-[1001] justify-around items-center">
+        <button onclick="app.navigate('main-app')" class="nav-btn active flex flex-col items-center gap-1">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            <span class="text-[8px] font-bold">HOME</span>
+        </button>
+        <button onclick="app.navigate('store-view')" class="nav-btn flex flex-col items-center gap-1">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <span class="text-[8px] font-bold">STORE</span>
+        </button>
+        <button class="w-12 h-12 bg-blue-600 rounded-full -mt-10 border-4 border-[#0b0f1a] flex items-center justify-center shadow-lg">
+            <i data-lucide="plus" class="text-white w-6 h-6"></i>
+        </button>
+        <button onclick="alert('Entertainment coming soon')" class="nav-btn flex flex-col items-center gap-1">
+            <i data-lucide="play" class="w-5 h-5"></i>
+            <span class="text-[8px] font-bold">MEDIA</span>
+        </button>
+        <button onclick="app.toggleModal('profile-modal', true)" class="nav-btn flex flex-col items-center gap-1">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span class="text-[8px] font-bold">ME</span>
+        </button>
     </nav>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <div id="profile-modal" class="modal">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-xl font-black italic">USER ACCOUNT</h2>
+            <button onclick="app.toggleModal('profile-modal', false)" class="p-2 bg-white/5 rounded-full">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <div class="glass p-8 rounded-[40px] text-center mb-6">
+            <div class="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl font-black border-4 border-white/10 shadow-xl">G</div>
+            <h3 id="profile-name" class="text-2xl font-black tracking-tight">Guest Explorer</h3>
+            <p id="profile-rank-label" class="text-blue-400 text-xs font-bold uppercase tracking-widest mt-1">Tier 1 Citizen</p>
+        </div>
+        <button onclick="location.reload()" class="w-full py-4 bg-red-500/10 text-red-500 rounded-2xl font-bold text-sm">Logout Session</button>
+    </div>
+
     <script>
-        const products = [
-            { id: 1, name: "Bulk Maize", cat: "Groceries", price: 150, img: "🌽" },
-            { id: 2, name: "Smart Node v1", cat: "Tech", price: 2500, img: "📱" },
-            { id: 3, name: "Founder Tee", cat: "Clothing", price: 350, img: "👕" },
-            { id: 4, name: "Vredefort Bash", cat: "Tickets", price: 100, img: "🎟️" }
-        ];
+        // --- CORE APPLICATION ENGINE ---
+        const app = {
+            state: {
+                user: { name: "Explorer", pts: 250, rank: "Newbie", avatar: "E" },
+                posts: [
+                    { user: "MelloBot", content: "Welcome to v10.9! Earn points by engaging with the community.", time: "Just now" },
+                    { user: "DevTeam", content: "Voucher conversion is now 15% faster.", time: "2h ago" }
+                ],
+                store: [
+                    { name: "Double Points (1h)", cost: 150, icon: "zap" },
+                    { name: "Pro Badge", cost: 500, icon: "shield-check" },
+                    { name: "1GB Data", cost: 300, icon: "wifi" },
+                    { name: "Market Access", cost: 1000, icon: "trending-up" }
+                ]
+            },
 
-        let cart = null;
+            init() {
+                lucide.createIcons();
+                this.renderFeed();
+                this.renderStore();
+                this.updateUI();
+            },
 
-        function filterStore(cat) {
-            const grid = document.getElementById('store-grid');
-            const items = products.filter(p => p.cat === cat);
-            grid.innerHTML = items.map(p => `
-                <div class="store-card glass p-4 rounded-2xl text-center" onclick="openCheckout(${p.id})">
-                    <div class="text-3xl mb-2">${p.img}</div>
-                    <h3 class="text-[10px] font-black uppercase text-white">${p.name}</h3>
-                    <p class="text-blue-400 font-bold text-xs mt-1">${p.price} PTS</p>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
+            updateUI() {
+                document.getElementById('header-pts').innerText = `${this.state.user.pts} PTS`;
+                document.getElementById('stat-rank').innerText = this.state.user.rank;
+                document.getElementById('user-avatar').innerText = this.state.user.avatar;
+            },
 
-        function openCheckout(id) {
-            cart = products.find(p => p.id === id);
-            document.getElementById('order-summary').innerHTML = `<p class="text-xs uppercase font-bold">Item: ${cart.name}</p><p class="text-blue-500 font-black">Price: ${cart.price} PTS</p>`;
-            toggleModal('checkout-ui', true);
-        }
+            navigate(viewId) {
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                document.getElementById(viewId).classList.add('active');
+                
+                // Update Nav Active State
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                event.currentTarget.classList.add('active');
+                
+                window.scrollTo(0, 0);
+            },
 
-        function confirmOrder() {
-            const name = document.getElementById('cust-name').value;
-            const contact = document.getElementById('cust-contact').value;
-            if(!name || !contact) return alert("Missing Details");
-            
-            alert(`ORDER DISPATCHED!\nFounder: ${name}\nContact: ${contact}\nItem: ${cart.name}\n\nSystem is calculating 20% Logistics Fee...`);
-            toggleModal('checkout-ui', false);
-            toggleModal('store-ui', false);
-        }
+            login(name = "User") {
+                this.state.user.name = name;
+                this.state.user.avatar = name.charAt(0).toUpperCase();
+                document.getElementById('auth-view').classList.remove('active');
+                document.getElementById('main-app').classList.add('active');
+                document.getElementById('app-nav').classList.remove('hidden');
+                document.getElementById('app-nav').classList.add('flex');
+                this.init();
+            },
 
-        function toggleModal(id, show) { document.getElementById(id).style.display = show ? 'flex' : 'none'; }
-        
-        // Init
-        window.onload = () => { 
-            var map = L.map('map', {zoomControl: false}).setView([-27.01, 27.49], 12);
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-            filterStore('Groceries');
-            lucide.createIcons();
+            toggleModal(id, show) {
+                const m = document.getElementById(id);
+                show ? m.classList.add('active') : m.classList.remove('active');
+            },
+
+            renderFeed() {
+                const feed = document.getElementById('global-feed');
+                feed.innerHTML = this.state.posts.map(post => `
+                    <div class="glass p-5 rounded-3xl border border-white/5">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold">${post.user[0]}</div>
+                            <div>
+                                <p class="text-xs font-black">${post.user}</p>
+                                <p class="text-[8px] text-gray-500 uppercase">${post.time}</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-300 leading-relaxed">${post.content}</p>
+                    </div>
+                `).join('');
+            },
+
+            renderStore() {
+                const grid = document.getElementById('store-grid');
+                grid.innerHTML = this.state.store.map(item => `
+                    <div class="glass p-5 rounded-3xl text-center hover:border-blue-500/50 transition duration-300">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="${item.icon}" class="text-blue-400 w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-xs font-black mb-1">${item.name}</h4>
+                        <p class="text-blue-400 font-black text-[10px] mb-4">${item.cost} PTS</p>
+                        <button onclick="app.buy('${item.name}', ${item.cost})" class="w-full py-2 bg-white/5 rounded-xl text-[8px] font-black uppercase hover:bg-blue-600 transition">Acquire</button>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            },
+
+            buy(name, cost) {
+                if(this.state.user.pts >= cost) {
+                    this.state.user.pts -= cost;
+                    alert(`Successfully acquired: ${name}`);
+                    this.updateUI();
+                } else {
+                    alert("Insufficient Points Balance");
+                }
+            },
+
+            redeemVoucher() {
+                const pin = document.getElementById('v-pin').value;
+                if(pin.length < 5) return alert("Invalid PIN format");
+                
+                // Simulate Backend Delay
+                const btn = event.target;
+                btn.innerText = "VERIFYING...";
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    this.state.user.pts += 500;
+                    this.updateUI();
+                    alert("Voucher Validated! +500 PTS added.");
+                    btn.innerText = "VALIDATE & CREDIT";
+                    btn.disabled = false;
+                    document.getElementById('v-pin').value = "";
+                }, 1500);
+            }
         };
+
+        function switchAuthTab(tab) {
+            const isLogin = tab === 'login';
+            document.getElementById('login-tab').className = isLogin ? 'flex-1 py-3 text-xs font-black uppercase tab-active' : 'flex-1 py-3 text-xs font-black uppercase text-gray-500';
+            document.getElementById('register-tab').className = !isLogin ? 'flex-1 py-3 text-xs font-black uppercase tab-active' : 'flex-1 py-3 text-xs font-black uppercase text-gray-500';
+            document.getElementById('login-form').style.display = isLogin ? 'block' : 'none';
+            document.getElementById('register-form').style.display = !isLogin ? 'block' : 'none';
+        }
+
+        // Run Icons on load
+        window.onload = () => lucide.createIcons();
     </script>
 </body>
 </html>

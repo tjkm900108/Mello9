@@ -41,7 +41,7 @@
         }
         
         .modal.active { display: flex; }
-        .view { display: none; padding-bottom: 120px; min-height: 100vh; }
+        .view { display: none; padding-bottom: 140px; padding-bottom: calc(120px + env(safe-area-inset-bottom)); min-height: 100vh; }
         .view.active { display: block; animation: fadeIn 0.3s ease-out; }
         
         @keyframes fadeIn {
@@ -137,6 +137,21 @@
         </header>
 
         <main class="p-4 max-w-2xl mx-auto space-y-6">
+            
+            <div class="carousel-container no-scrollbar">
+                <a href="#store-view" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-blue-500">
+                    <i data-lucide="shopping-cart" class="w-5 h-5 mx-auto mb-2 text-blue-400"></i>
+                    <p class="text-[10px] font-black uppercase">Store</p>
+                </a>
+                <a href="#profile-modal" onclick="app.toggleModal("profile-modal", true)" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-purple-500">
+                    <i data-lucide="user" class="w-5 h-5 mx-auto mb-2 text-purple-400"></i>
+                    <p class="text-[10px] font-black uppercase">Identity</p>
+                </a>
+                <a href="#main-app" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-green-500">
+                    <i data-lucide="zap" class="w-5 h-5 mx-auto mb-2 text-green-400"></i>
+                    <p class="text-[10px] font-black uppercase">Network</p>
+                </a>
+            </div>
             <div class="grid grid-cols-2 gap-3">
                 <div class="glass p-4 rounded-2xl border-l-4 border-blue-500">
                     <p class="text-[10px] uppercase text-gray-500 font-black">Rank</p>
@@ -223,6 +238,14 @@
                 ]
             },
 
+            handleRouting() {
+                const hash = window.location.hash.replace("#", "") || "main-app";
+                if (document.getElementById(hash)) this.navigate(hash);
+            },
+            handleRouting() {
+                const hash = window.location.hash.replace("#", "") || "main-app";
+                if (document.getElementById(hash)) this.navigate(hash);
+            },
             init() {
                 lucide.createIcons();
                 this.renderFeed();
@@ -254,7 +277,7 @@
                 document.getElementById('main-app').classList.add('active');
                 document.getElementById('app-nav').classList.remove('hidden');
                 document.getElementById('app-nav').classList.add('flex');
-                this.init();
+                this.handleRouting(); window.addEventListener("hashchange", () => this.handleRouting()); this.init();
             },
 
             toggleModal(id, show) {

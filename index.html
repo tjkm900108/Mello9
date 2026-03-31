@@ -1,271 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mellogram v10.9 | Digital Economic Ecosystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root { 
-            --mello-blue: #5d87ff; 
-            --mello-bg: #0b0f1a;
-            --mello-card: #171c29;
-        }
-        
+        :root { --mello-blue: #5d87ff; --mello-bg: #0b0f1a; --mello-card: #171c29; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            background-color: var(--mello-bg); 
-            color: #e5e7eb; 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            overflow-x: hidden;
-        }
-        
-        .glass { 
-            background: rgba(23, 28, 41, 0.96); 
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-        
-        .modal { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            z-index: 5000; 
-            background: rgba(11, 15, 26, 0.98);
-            padding: 20px; 
-            flex-direction: column; 
-            overflow-y: auto;
-        }
-        
-        .modal.active { display: flex; }
-        .view { display: none; padding-bottom: 140px; padding-bottom: calc(120px + env(safe-area-inset-bottom)); min-height: 100vh; }
+        body { background-color: var(--mello-bg); color: #e5e7eb; font-family: system-ui, sans-serif; overflow-x: hidden; }
+        .glass { background: rgba(23, 28, 41, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
+        .view { display: none; min-height: 100vh; padding-bottom: 100px; }
         .view.active { display: block; animation: fadeIn 0.3s ease-out; }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        .modal { display: none; position: fixed; inset: 0; z-index: 5000; background: rgba(11, 15, 26, 0.98); padding: 20px; }
+        .modal.active { display: flex; flex-direction: column; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        input, textarea, select { 
-            background: rgba(255,255,255,0.05) !important; 
-            border: 1px solid rgba(255,255,255,0.1) !important; 
-            color: white !important;
-        }
-
-        .carousel-container {
-            display: flex;
-            overflow-x: auto;
-            gap: 16px;
-            scroll-snap-type: x mandatory;
-            padding: 10px 0;
-        }
-        
-        .carousel-item {
-            flex: 0 0 160px;
-            scroll-snap-align: start;
-        }
-
-        .tab-active { 
-            border-bottom: 2px solid #5d87ff;
-            color: #5d87ff !important;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #5d87ff, #3d67cf);
-            transition: all 0.2s ease;
-        }
-        
-        .btn-primary:active { transform: scale(0.95); }
-
-        nav button.active { color: #5d87ff; }
     </style>
 </head>
 <body>
 
     <div id="auth-view" class="view active flex flex-col justify-center p-6">
-        <div class="max-w-md mx-auto w-full">
-            <div class="text-center mb-10">
-                <h1 class="text-6xl font-black italic mb-2 tracking-tighter">MELLO<span class="text-blue-500">GRAM</span></h1>
-                <p class="text-gray-500 text-[10px] uppercase tracking-[0.3em]">Digital Economic Ecosystem</p>
-            </div>
-
-            <div class="glass rounded-3xl p-6 mb-8 shadow-2xl">
-                <div class="flex gap-4 mb-8 border-b border-white/5">
-                    <button onclick="switchAuthTab('login')" id="login-tab" class="flex-1 py-3 text-xs font-black uppercase tab-active">Login</button>
-                    <button onclick="switchAuthTab('register')" id="register-tab" class="flex-1 py-3 text-xs font-black uppercase text-gray-500">Register</button>
-                </div>
-
-                <div id="login-form" class="space-y-4">
-                    <input type="email" placeholder="Email Address" class="w-full p-4 rounded-2xl outline-none text-sm">
-                    <input type="password" placeholder="Password" class="w-full p-4 rounded-2xl outline-none text-sm">
-                    <button onclick="app.login()" class="w-full py-4 btn-primary rounded-2xl font-black uppercase text-white">Access Portal</button>
-                </div>
-
-                <div id="register-form" class="space-y-4 hidden">
-                    <input type="text" placeholder="Username" class="w-full p-4 rounded-2xl outline-none text-sm">
-                    <input type="email" placeholder="Email" class="w-full p-4 rounded-2xl outline-none text-sm">
-                    <input type="password" placeholder="Password" class="w-full p-4 rounded-2xl outline-none text-sm">
-                    <select class="w-full p-4 rounded-2xl outline-none text-sm appearance-none">
-                        <option value="ng">Nigeria</option>
-                        <option value="za">South Africa</option>
-                        <option value="us">USA</option>
-                    </select>
-                    <button onclick="app.login()" class="w-full py-4 btn-primary rounded-2xl font-black uppercase text-white">Create Identity</button>
-                </div>
-            </div>
-
-            <button onclick="app.login('Guest')" class="w-full text-blue-400 text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition">Enter as Guest Explorer</button>
+        <div class="text-center mb-10">
+            <h1 class="text-5xl font-black italic tracking-tighter">MELLO<span class="text-blue-500">GRAM</span></h1>
+            <p class="text-[10px] uppercase tracking-widest opacity-50">v10.9 Persistent Engine</p>
         </div>
-                    <i data-lucide="shopping-cart" class="w-5 h-5 mx-auto mb-2 text-blue-400"></i>
-                    <p class="text-[10px] font-black uppercase">Store</p>
-                </a>
-                <a href="#profile-modal" onclick="app.toggleModal("profile-modal", true)" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-purple-500">
-                    <i data-lucide="user" class="w-5 h-5 mx-auto mb-2 text-purple-400"></i>
-                    <p class="text-[10px] font-black uppercase">Identity</p>
-                </a>
-                <a href="#main-app" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-green-500">
-                    <i data-lucide="zap" class="w-5 h-5 mx-auto mb-2 text-green-400"></i>
-                    <p class="text-[10px] font-black uppercase">Network</p>
-                </a>
-            </div>
-            
-            <div class="carousel-container no-scrollbar">
-                <a href="#main-app" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-orange-500">
-                    <i data-lucide="code" class="w-5 h-5 mx-auto mb-2 text-orange-400"></i>
-                    <p class="text-[10px] font-black uppercase">Development</p>
-                </a>
-                <a href="#main-app" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-pink-500">
-                    <i data-lucide="play-circle" class="w-5 h-5 mx-auto mb-2 text-pink-400"></i>
-                    <p class="text-[10px] font-black uppercase">Entertainment</p>
-                </a>
-            </div>
-                <a href="#store-view" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-blue-500">
-                    <i data-lucide="shopping-cart" class="w-5 h-5 mx-auto mb-2 text-blue-400"></i>
-                    <p class="text-[10px] font-black uppercase">Store</p>
-                </a>
-                <a href="#profile-modal" onclick="app.toggleModal("profile-modal", true)" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-purple-500">
-                    <i data-lucide="user" class="w-5 h-5 mx-auto mb-2 text-purple-400"></i>
-                    <p class="text-[10px] font-black uppercase">Identity</p>
-                </a>
-                <a href="#main-app" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-green-500">
-                    <i data-lucide="zap" class="w-5 h-5 mx-auto mb-2 text-green-400"></i>
-                    <p class="text-[10px] font-black uppercase">Network</p>
-                </a>
-            </div>
-            <div class="carousel-container no-scrollbar">
-                <a href="#store-view" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-blue-500">
-                    <i data-lucide="shopping-cart" class="w-5 h-5 mx-auto mb-2 text-blue-400"></i>
-                    <p class="text-[10px] font-black uppercase">Store</p>
-                </a>
-                <a href="#profile-modal" onclick="app.toggleModal("profile-modal", true)" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-purple-500">
-                    <i data-lucide="user" class="w-5 h-5 mx-auto mb-2 text-purple-400"></i>
-                    <p class="text-[10px] font-black uppercase">Identity</p>
-                </a>
-                <a href="#main-app" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-green-500">
-                    <i data-lucide="zap" class="w-5 h-5 mx-auto mb-2 text-green-400"></i>
-                    <p class="text-[10px] font-black uppercase">Network</p>
-                </a>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div class="glass p-4 rounded-2xl border-l-4 border-blue-500">
-                    <p class="text-[10px] uppercase text-gray-500 font-black">Rank</p>
-                    <p id="stat-rank" class="text-lg font-black text-white">Loading...</p>
-                </div>
-                <div class="glass p-4 rounded-2xl border-l-4 border-green-500">
-                    <p class="text-[10px] uppercase text-gray-500 font-black">Daily Earn</p>
-                    <p class="text-lg font-black text-white">+12.5%</p>
-                </div>
-            </div>
+        <div class="glass rounded-3xl p-6 space-y-4">
+            <input type="text" id="login-name" placeholder="Enter Username" class="w-full p-4 rounded-2xl bg-white/5 border border-white/10 outline-none">
+            <button onclick="app.login(document.getElementById('login-name').value)" class="w-full py-4 bg-blue-600 rounded-2xl font-black uppercase text-white shadow-lg shadow-blue-500/20">Access Portal</button>
+        </div>
+    </div>
 
-            <div class="space-y-4" id="global-feed">
-                </div>
+    <div id="main-app" class="view">
+        <header class="p-4 glass sticky top-0 z-50 flex justify-between items-center">
+            <span class="font-black italic">MELLO<span class="text-blue-500">GRAM</span></span>
+            <div id="header-pts" class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-black">0 PTS</div>
+        </header>
+        <main class="p-4 space-y-6">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="glass p-4 rounded-2xl border-l-4 border-blue-500"><p class="text-[10px] uppercase opacity-50">Rank</p><p id="stat-rank" class="font-black">--</p></div>
+                <div class="glass p-4 rounded-2xl border-l-4 border-green-500"><p class="text-[10px] uppercase opacity-50">Daily</p><p class="font-black text-green-400">+12.5%</p></div>
+            </div>
+            <div id="global-feed" class="space-y-4"></div>
         </main>
     </div>
 
     <div id="store-view" class="view">
-        <header class="p-4 glass sticky top-0 z-[1000] border-b border-white/5">
-            <h1 class="text-xl font-black italic text-center">MELLO<span class="text-blue-500">STORE</span></h1>
-        </header>
-        <main class="p-4 max-w-2xl mx-auto space-y-6">
+        <header class="p-4 glass sticky top-0 z-50"><h1 class="text-center font-black italic">MELLO<span class="text-blue-500">STORE</span></h1></header>
+        <main class="p-4 space-y-6">
             <div class="glass p-6 rounded-3xl border-yellow-500/20">
-                <h3 class="text-xs font-black uppercase text-yellow-500 mb-4 flex items-center gap-2">
-                    <i data-lucide="ticket" class="w-4 h-4"></i> Voucher Terminal
-                </h3>
-                <input type="text" id="v-pin" placeholder="Enter Voucher PIN" class="w-full p-4 rounded-2xl mb-3 text-sm">
-                <button onclick="app.redeemVoucher()" class="w-full py-3 bg-yellow-600 rounded-xl font-black text-xs uppercase">Validate & Credit</button>
+                <p class="text-[10px] font-black uppercase text-yellow-500 mb-2">Voucher Terminal</p>
+                <input type="text" id="v-pin" placeholder="PIN" class="w-full p-3 rounded-xl bg-white/5 border border-white/10 mb-3">
+                <button onclick="app.redeemVoucher()" class="w-full py-3 bg-yellow-600 rounded-xl font-black text-xs uppercase">Credit Points</button>
             </div>
             <div id="store-grid" class="grid grid-cols-2 gap-4"></div>
         </main>
     </div>
 
-    <nav id="app-nav" class="fixed bottom-0 w-full glass p-3 hidden border-t border-white/10 z-[1001] justify-around items-center">
-        <button onclick="app.navigate('main-app')" class="nav-btn active flex flex-col items-center gap-1">
-            <i data-lucide="home" class="w-5 h-5"></i>
-            <span class="text-[8px] font-bold">HOME</span>
-        </button>
-        <button onclick="app.navigate('store-view')" class="nav-btn flex flex-col items-center gap-1">
-            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-            <span class="text-[8px] font-bold">STORE</span>
-        </button>
-        <button class="w-12 h-12 bg-blue-600 rounded-full -mt-10 border-4 border-[#0b0f1a] flex items-center justify-center shadow-lg">
-            <i data-lucide="plus" class="text-white w-6 h-6"></i>
-        </button>
-        <button onclick="alert('Entertainment coming soon')" class="nav-btn flex flex-col items-center gap-1">
-            <i data-lucide="play" class="w-5 h-5"></i>
-            <span class="text-[8px] font-bold">MEDIA</span>
-        </button>
-        <button onclick="app.toggleModal('profile-modal', true)" class="nav-btn flex flex-col items-center gap-1">
-            <i data-lucide="user" class="w-5 h-5"></i>
-            <span class="text-[8px] font-bold">ME</span>
-        </button>
+    <nav id="app-nav" class="fixed bottom-0 w-full glass p-4 hidden justify-around items-center border-t border-white/10">
+        <button onclick="app.navigate('main-app')" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100"><i data-lucide="home" class="w-5 h-5"></i></button>
+        <button onclick="app.navigate('store-view')" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100"><i data-lucide="shopping-bag" class="w-5 h-5"></i></button>
+        <button onclick="app.toggleModal('profile-modal', true)" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100"><i data-lucide="user" class="w-5 h-5"></i></button>
     </nav>
 
     <div id="profile-modal" class="modal">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="text-xl font-black italic">USER ACCOUNT</h2>
-            <button onclick="app.toggleModal('profile-modal', false)" class="p-2 bg-white/5 rounded-full">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
+            <h2 class="font-black">IDENTITY</h2>
+            <button onclick="app.toggleModal('profile-modal', false)" class="p-2"><i data-lucide="x"></i></button>
         </div>
-        <div class="glass p-8 rounded-[40px] text-center mb-6">
-            <div class="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl font-black border-4 border-white/10 shadow-xl">G</div>
-            <h3 id="profile-name" class="text-2xl font-black tracking-tight">Guest Explorer</h3>
-            <p id="profile-rank-label" class="text-blue-400 text-xs font-bold uppercase tracking-widest mt-1">Tier 1 Citizen</p>
+        <div class="glass p-10 rounded-[40px] text-center">
+            <div id="user-avatar" class="w-16 h-16 bg-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-black">?</div>
+            <h3 id="profile-name" class="text-xl font-black">---</h3>
+            <button onclick="localStorage.clear(); location.reload();" class="mt-8 text-red-500 text-xs font-bold uppercase">Reset State</button>
         </div>
-        <button onclick="location.reload()" class="w-full py-4 bg-red-500/10 text-red-500 rounded-2xl font-bold text-sm">Logout Session</button>
     </div>
 
 <script>
-// --- MELLOGRAM CORE ENGINE v10.9 (Persistent) ---
 const app = {
     state: {
         user: { name: "Explorer", pts: 250, rank: "Citizen", avatar: "E" },
         posts: [
-            { user: "MelloBot", content: "Welcome to v10.9! Your data is now saved locally.", time: "Just now" },
-            { user: "System", content: "Persistence Layer: Online.", time: "1m ago" }
+            { user: "MelloBot", content: "Persistence layer active. Points are now stored in browser.", time: "Just now" },
+            { user: "Founder", content: "Building the future of digital communities.", time: "2h ago" }
         ],
         store: [
-            { name: "Double Points (1h)", cost: 150, icon: "zap" },
             { name: "Pro Badge", cost: 500, icon: "shield-check" },
-            { name: "1GB Data", cost: 300, icon: "wifi" },
-            { name: "Market Access", cost: 1000, icon: "trending-up" }
+            { name: "Double Earn", cost: 150, icon: "zap" },
+            { name: "Data Pack", cost: 300, icon: "wifi" }
         ]
     },
     init() {
-        this.load(); // Load saved data on startup
+        this.load();
         this.renderFeed();
         this.renderStore();
         this.updateUI();
-        window.addEventListener("hashchange", () => this.handleRouting());
-        this.handleRouting();
+        lucide.createIcons();
     },
-    save() {
-        localStorage.setItem('mello_state', JSON.stringify(this.state.user));
-    },
+    save() { localStorage.setItem('mello_state', JSON.stringify(this.state.user)); },
     load() {
         const saved = localStorage.getItem('mello_state');
         if (saved) this.state.user = JSON.parse(saved);
@@ -275,50 +107,57 @@ const app = {
         document.getElementById('stat-rank').innerText = this.state.user.rank;
         document.getElementById('user-avatar').innerText = this.state.user.avatar;
         document.getElementById('profile-name').innerText = this.state.user.name;
-        lucide.createIcons();
     },
-    handleRouting() {
-        const hash = window.location.hash.replace("#", "") || "main-app";
-        if (document.getElementById(hash)) this.navigate(hash);
-    },
-    navigate(viewId) {
+    navigate(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        const targetView = document.getElementById(viewId);
-        if (targetView) targetView.classList.add('active');
-        window.scrollTo(0, 0);
+        document.getElementById(id).classList.add('active');
+        window.scrollTo(0,0);
     },
-    login(name = "User") {
+    toggleModal(id, show) {
+        document.getElementById(id).classList.toggle('active', show);
+    },
+    login(name) {
+        if(!name) return alert("Enter name");
         this.state.user.name = name;
-        this.state.user.avatar = name.charAt(0).toUpperCase();
+        this.state.user.avatar = name[0].toUpperCase();
         this.save();
-        document.getElementById('auth-view').classList.remove('active');
-        document.getElementById('main-app').classList.add('active');
         document.getElementById('app-nav').classList.replace('hidden', 'flex');
-        this.init();
-    },
-    buy(name, cost) {
-        if(this.state.user.pts >= cost) {
-            this.state.user.pts -= cost;
-            this.save(); // Save after spending
-            alert(`Acquired: ${name}`);
-            this.updateUI();
-        } else {
-            alert("Insufficient Points");
-        }
+        this.navigate('main-app');
+        this.updateUI();
     },
     redeemVoucher() {
-        const pin = document.getElementById('v-pin').value;
-        if(pin.length < 5) return alert("Invalid PIN");
         this.state.user.pts += 500;
-        this.save(); // Save after earning
+        this.save();
         this.updateUI();
-        alert("Voucher Validated! +500 PTS");
-        document.getElementById('v-pin').value = "";
+        alert("Success! +500 PTS");
     },
-    renderFeed() { /* same as before */ },
-    renderStore() { /* same as before */ }
+    renderFeed() {
+        document.getElementById('global-feed').innerHTML = this.state.posts.map(p => `
+            <div class="glass p-4 rounded-2xl">
+                <p class="text-[10px] font-black text-blue-400 mb-1">${p.user}</p>
+                <p class="text-sm">${p.content}</p>
+            </div>
+        `).join('');
+    },
+    renderStore() {
+        document.getElementById('store-grid').innerHTML = this.state.store.map(i => `
+            <div class="glass p-4 rounded-2xl text-center">
+                <h4 class="text-[10px] font-black uppercase mb-2">${i.name}</h4>
+                <p class="text-xs text-blue-500 mb-3">${i.cost} PTS</p>
+                <button onclick="app.buy('${i.name}', ${i.cost})" class="w-full py-2 bg-white/5 rounded-lg text-[8px] font-black uppercase">Acquire</button>
+            </div>
+        `).join('');
+    },
+    buy(n, c) {
+        if(this.state.user.pts >= c) {
+            this.state.user.pts -= c;
+            this.save();
+            this.updateUI();
+            alert("Purchased " + n);
+        } else alert("Short on PTS");
+    }
 };
-window.onload = () => { lucide.createIcons(); app.init(); };
+window.onload = () => app.init();
 </script>
 </body>
 </html>

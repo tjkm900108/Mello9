@@ -152,7 +152,17 @@
                     <p class="text-[10px] font-black uppercase">Network</p>
                 </a>
             </div>
+            
             <div class="carousel-container no-scrollbar">
+                <a href="#main-app" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-orange-500">
+                    <i data-lucide="code" class="w-5 h-5 mx-auto mb-2 text-orange-400"></i>
+                    <p class="text-[10px] font-black uppercase">Development</p>
+                </a>
+                <a href="#main-app" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-pink-500">
+                    <i data-lucide="play-circle" class="w-5 h-5 mx-auto mb-2 text-pink-400"></i>
+                    <p class="text-[10px] font-black uppercase">Entertainment</p>
+                </a>
+            </div>
                 <a href="#store-view" class="carousel-item glass p-4 rounded-2xl text-center border-b-2 border-blue-500">
                     <i data-lucide="shopping-cart" class="w-5 h-5 mx-auto mb-2 text-blue-400"></i>
                     <p class="text-[10px] font-black uppercase">Store</p>
@@ -314,19 +324,29 @@
             },
 
             renderFeed() {
-                const feed = document.getElementById('global-feed');
+                const feed = document.getElementById("global-feed");
                 feed.innerHTML = this.state.posts.map(post => `
-                    <div class="glass p-5 rounded-3xl border border-white/5">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold">${post.user[0]}</div>
-                            <div>
-                                <p class="text-xs font-black">${post.user}</p>
-                                <p class="text-[8px] text-gray-500 uppercase">${post.time}</p>
+                    <div class="glass p-4 rounded-3xl border border-white/5">
+                        <div class="flex gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex-shrink-0 flex items-center justify-center font-black text-xs text-white">${post.user[0]}</div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-1">
+                                    <p class="text-sm font-black">${post.user}</p>
+                                    <i data-lucide="check-circle-2" class="w-3 h-3 text-blue-400 fill-blue-400/20"></i>
+                                    <span class="text-gray-500 text-[10px] ml-1">· ${post.time}</span>
+                                </div>
+                                <p class="text-sm text-gray-300 mt-1 leading-relaxed">${post.content}</p>
+                                <div class="flex justify-between mt-4 max-w-xs text-gray-500">
+                                    <button class="flex items-center gap-2 hover:text-blue-400 transition"><i data-lucide="message-square" class="w-4 h-4"></i><span class="text-[10px]">12</span></button>
+                                    <button class="flex items-center gap-2 hover:text-green-400 transition"><i data-lucide="repeat" class="w-4 h-4"></i><span class="text-[10px]">5</span></button>
+                                    <button class="flex items-center gap-2 hover:text-red-400 transition"><i data-lucide="heart" class="w-4 h-4"></i><span class="text-[10px]">48</span></button>
+                                    <button class="flex items-center gap-2 hover:text-blue-400 transition"><i data-lucide="share" class="w-4 h-4"></i></button>
+                                </div>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-300 leading-relaxed">${post.content}</p>
                     </div>
-                `).join('');
+                `).join("");
+                lucide.createIcons();
             },
 
             renderStore() {
